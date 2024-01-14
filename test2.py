@@ -3,12 +3,15 @@ import time
 from datetime import datetime
 import json
 
+
 # Read liputus JSON
-with open('liputus.json', 'r') as file:
-    liputukset = json.load(file)
+def readFile(filename):
+    with open(filename, 'r') as file:
+        content = json.load(file)
+    return content
 # Read liputus JSON
-with open('nurmikko.json', 'r') as file:
-    nurmikko = json.load(file)
+#with open('nurmikko.json', 'r') as file:
+#    nurmikko = json.load(file)
 
 # Get the current date
 current_date = datetime.today()
@@ -75,7 +78,7 @@ def write_text(stdscr, text, y, x, repeat, color_pair, color_by_row = []):
         #stdscr.refresh()
         #time.sleep(0.1)
 
-def program(stdscr,loop,once):
+def program(stdscr,loop,once,liputukset,nurmikko):
     curses.curs_set(0)  # Hide the cursor
     #stdscr.clear()
 
@@ -194,7 +197,16 @@ def main(stdscr):
     once = [True]
     while True:
         loop += 1
-        program(stdscr,loop,once)
+
+        if loop == 1: #first time
+            liputukset = readFile('liputus.json')
+            nurmikko = readFile('nurmikko.json')
+
+        if loop % 10 == 0: #every 10 times
+            liputukset = readFile('liputus.json')
+            nurmikko = readFile('nurmikko.json')
+
+        program(stdscr,loop,once,liputukset,nurmikko)
         curses.delay_output(1000)
 
 curses.wrapper(main)
