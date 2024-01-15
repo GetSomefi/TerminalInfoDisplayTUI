@@ -1,8 +1,12 @@
 import curses
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
+animate = False
+week_number = None
+formatted_date = None
+current_date = None
 
 # Read liputus JSON
 def readFile(filename):
@@ -13,11 +17,22 @@ def readFile(filename):
 #with open('nurmikko.json', 'r') as file:
 #    nurmikko = json.load(file)
 
-# Get the current date
-current_date = datetime.today()
-formatted_date = current_date.strftime("%d.%m.%Y")
-# Get the week number
-week_number = current_date.isocalendar()[1]
+
+
+def updateDate():
+    global formatted_date
+    global week_number
+    global current_date
+    # Get the current date
+    current_date = datetime.today()
+
+    #for testing
+    ##time_difference = timedelta(days=0, hours=21, minutes=38)
+    ##current_date = current_date - time_difference
+
+    formatted_date = current_date.strftime("%d.%m.%Y")
+    # Get the week number
+    week_number = current_date.isocalendar()[1]
 
 def limit_string_length(input_string, max_length):
     """
@@ -55,6 +70,8 @@ def createPanel(stdscr,width, ph, panel_msg, pos):
     stdscr.refresh()
 
 def write_text(stdscr, text, y, x, repeat, color_pair, color_by_row = []):
+    global animate
+
     # Enable color if supported
     curses.start_color()
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -70,19 +87,25 @@ def write_text(stdscr, text, y, x, repeat, color_pair, color_by_row = []):
                 if len(color_by_row)>0:
                     color_ = curses.color_pair(color_by_row[row_pos])
                 stdscr.addch(y + row_pos, x, char, color_) #to bold  | curses.A_BOLD
-                stdscr.refresh()
-                #time.sleep(0.01)  # Optional: Pause to see the effect
+                #stdscr.refresh()
+                if animate:
+                    stdscr.refresh()
+                    time.sleep(0.01)
             x += 1
         row_pos += 1
         x = orig_pos
-        #stdscr.refresh()
-        #time.sleep(0.1)
+
+        # if animate:
+        #     stdscr.refresh()
+        #     time.sleep(0.1)
 
 def program(stdscr,loop,once,liputukset,nurmikko):
     curses.curs_set(0)  # Hide the cursor
     #stdscr.clear()
 
-
+    global formatted_date
+    global week_number
+    global current_date
 
     height, width = stdscr.getmaxyx()
 
@@ -115,8 +138,8 @@ def program(stdscr,loop,once,liputukset,nurmikko):
     ]
     x = max(0, (width - len(write_date[0])) // 2)
     y = height // 2
-    if once[0]:
-        write_text(stdscr, write_date, padding, x, 1, 1)
+    #if once[0]:
+    write_text(stdscr, write_date, padding, x, 1, 1)
 
     panel1_pos = [y-8, padding] #nää menee y,x suuntaisesti
     createPanel(stdscr,width, 3, "Liputusvuoro",panel1_pos)
@@ -159,8 +182,8 @@ def program(stdscr,loop,once,liputukset,nurmikko):
         "Asunto " + flagEventApartmentNext
     ]
     color_by_row = [1,1,3,1,1,1]
-    if once[0]:
-        write_text(stdscr, message, start_pos[0], start_pos[1], 1, 3, color_by_row)
+    #if once[0]:
+    write_text(stdscr, message, start_pos[0], start_pos[1], 1, 3, color_by_row)
 
 #####nurmikko
     panel1_pos = [y+2, padding] #nää menee y,x suuntaisesti
@@ -184,27 +207,34 @@ def program(stdscr,loop,once,liputukset,nurmikko):
         "Tulossa seuraavalla viikolla",
         grassNext
     ]
-    if once[0]:
-        write_text(stdscr, message, start_pos[0], start_pos[1], repeat=1, color_pair=1)
+    #if once[0]:
+    write_text(stdscr, message, start_pos[0], start_pos[1], repeat=1, color_pair=1)
 
     once = False
     #stdscr.getch()  # Wait for user input
 
 
 def main(stdscr):
+    global animate
     # Run an update loop
     loop = 0
     once = [True]
     while True:
         loop += 1
 
+        animate = False
+        updateDate()
+
         if loop == 1: #first time
             liputukset = readFile('liputus.json')
             nurmikko = readFile('nurmikko.json')
 
-        if loop % 10 == 0: #every 10 times
+        if loop % 60 == 0: #every 60 times
+            curses.flash()
             liputukset = readFile('liputus.json')
             nurmikko = readFile('nurmikko.json')
+            stdscr.clear()
+            animate = True
 
         program(stdscr,loop,once,liputukset,nurmikko)
         curses.delay_output(1000)
