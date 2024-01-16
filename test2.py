@@ -27,8 +27,8 @@ def updateDate():
     current_date = datetime.today()
 
     #for testing
-    ##time_difference = timedelta(days=0, hours=21, minutes=38)
-    ##current_date = current_date - time_difference
+    #time_difference = timedelta(days=0, hours=16, minutes=32)
+    #current_date = current_date - time_difference
 
     formatted_date = current_date.strftime("%d.%m.%Y")
     # Get the week number
@@ -43,11 +43,15 @@ def limit_string_length(input_string, max_length):
     else:
         return input_string
 
-def get_next_matching_date(date_objects,compare):
+def get_next_matching_date(date_objects,compare, accept_today = False):
     # Find the next matching date
     next_matching_date = None
+
     for date in sorted(date_objects.keys()):
-        if date > compare:
+        if date.strftime("%d.%m.%Y") == compare.strftime("%d.%m.%Y") and accept_today:
+            next_matching_date = date
+            break
+        elif date > compare:
             next_matching_date = date
             break
     return next_matching_date
@@ -125,8 +129,8 @@ def program(stdscr,loop,once,liputukset,nurmikko):
 
     #loop kerrat
     looped = [str(loop)]
-    posx = width - len(looped) - padding
-    write_text(stdscr, looped, height-5, posx, 1, 2)
+    posx = padding
+    write_text(stdscr, looped, height-4, posx, 1, 2)
 
     the_date = f"Tänään on {formatted_date}, viikko {week_number}"
     clock_ = f"Kello {clock()}"
@@ -152,7 +156,7 @@ def program(stdscr,loop,once,liputukset,nurmikko):
     # Convert date strings to datetime objects
     date_objects = {datetime.strptime(date, "%d.%m.%Y"): event for date, event in date_events.items()}
 
-    next_matching_date = get_next_matching_date(date_objects,current_date)
+    next_matching_date = get_next_matching_date(date_objects,current_date, True)
     flagContent = "Odottaa uusia liputusvuoroja (kontaktoi Virtanen)"
     next_matching_formatted_date = ""
     flagEventApartment = ""
@@ -229,8 +233,8 @@ def main(stdscr):
             liputukset = readFile('liputus.json')
             nurmikko = readFile('nurmikko.json')
 
-        if loop % 60 == 0: #every 60 times
-            curses.flash()
+        if loop % 600 == 0: #every 60 times
+            #curses.flash()
             liputukset = readFile('liputus.json')
             nurmikko = readFile('nurmikko.json')
             stdscr.clear()
