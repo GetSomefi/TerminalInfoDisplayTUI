@@ -241,6 +241,7 @@ def main(stdscr):
             animate = True
 
         program(stdscr,loop,once,liputukset,nurmikko)
-        curses.delay_output(1000)
+        #curses.delay_output(1000) does not work in raspberry
+        time.sleep(1)
 
 curses.wrapper(main)
