@@ -114,13 +114,14 @@ def program(stdscr,loop,once,liputukset,nurmikko):
     height, width = stdscr.getmaxyx()
 
     padding = 2
-    start_pos = [padding,padding] #HUOM. y,x
+    #start_pos = [padding,padding] #HUOM. y,x
     message = [
         "####################",
         "## INFOTAULU 2000 ##",
         "####################",
         "      by Retro-hiiri"
     ]
+    start_pos = [height-len(message),width-len(message[0])-padding]
     if once[0]:
         write_text(stdscr, message, start_pos[0], start_pos[1], 1, 2)
         # xy = [str(width) + " " + str(height)]
@@ -130,7 +131,7 @@ def program(stdscr,loop,once,liputukset,nurmikko):
     #loop kerrat
     looped = [str(loop)]
     posx = padding
-    write_text(stdscr, looped, height-4, posx, 1, 2)
+    write_text(stdscr, looped, height-1, posx, 1, 2)
 
     the_date = f"Tänään on {formatted_date}, viikko {week_number}"
     clock_ = f"Kello {clock()}"
@@ -142,8 +143,9 @@ def program(stdscr,loop,once,liputukset,nurmikko):
     ]
     x = max(0, (width - len(write_date[0])) // 2)
     y = height // 2
+    clock_pos = len(message)+3
     #if once[0]:
-    write_text(stdscr, write_date, padding, x, 1, 1)
+    write_text(stdscr, write_date, clock_pos, x, 1, 1)
 
     panel1_pos = [y-8, padding] #nää menee y,x suuntaisesti
     createPanel(stdscr,width, 3, "Liputusvuoro",panel1_pos)
