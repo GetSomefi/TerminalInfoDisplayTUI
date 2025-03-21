@@ -129,9 +129,9 @@ def program(stdscr,loop,once,liputukset,nurmikko):
         # write_text(stdscr, xy, height-6, posx, 1, 2)
 
     #loop kerrat
-    looped = [str(loop)]
-    posx = padding
-    write_text(stdscr, looped, height-1, posx, 1, 2)
+    #looped = [str(loop)]
+    #posx = padding
+    #write_text(stdscr, looped, height-1, posx, 1, 2)
 
     the_date = f"Tänään on {formatted_date}, viikko {week_number}"
     clock_ = f"Kello {clock()}"
@@ -143,8 +143,8 @@ def program(stdscr,loop,once,liputukset,nurmikko):
     ]
     x = max(0, (width - len(write_date[0])) // 2)
     y = height // 2
-    clock_pos = len(message)+3
     #if once[0]:
+    clock_pos = len(message) + 3
     write_text(stdscr, write_date, clock_pos, x, 1, 1)
 
     panel1_pos = [y-8, padding] #nää menee y,x suuntaisesti
